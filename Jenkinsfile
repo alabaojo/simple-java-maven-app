@@ -29,8 +29,8 @@ pipeline {
         stage('Build and Publish Image') {
             when {
                 branch 'master'    //only run these steps on the master branch
-            }ss
-            steps {s
+            }
+            steps {
                 sh """
                     docker build -t ${IMAGE} .
                     docker tag ${IMAGE} ${IMAGE}:${VERSION}
