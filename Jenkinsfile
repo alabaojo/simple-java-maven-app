@@ -1,46 +1,41 @@
-pipeline {
-    agent {
-        docker {
-            image 'maven:3-alpine'
-            args '-v /root/.m2:/root/.m2'
-        }
-    }
 
-    environment {
-        IMAGE = readMavenPom().getArtifactId()    //Use Pipeline Utility Steps
-        VERSION = readMavenPom().getVersion()
-    }
+pipeline {
+    agent none
     stages {
-        stage('BuildB') {
+        stage('Build') {
+            agent any
             steps {
-                sh 'mvn -B -DskipTests clean package'
+                checkout scm
+                sh 'make'
+                stash includes: '**/target/*.jar', name: 'app' 
             }
         }
-        stage('Test') {
+        stage('Test on Linux') {
+            agent { 
+                label 'linux'
+            }
             steps {
-                sh 'mvn test'
+                unstash 'app' 
+                sh 'make check'
             }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml'
+                    junit '**/target/*.xml'
                 }
             }
         }
-        stage('Build and Publish Image') {
-            when {
-                branch 'master'    //only run these steps on the master branch
+        stage('Test on Windows') {
+            agent {
+                label 'windows'
             }
             steps {
-                sh '
-                    docker build -t ${IMAGE} .
-                    docker tag ${IMAGE} ${IMAGE}:${VERSION}
-                    docker push ${IMAGE}:${VERSION}
-                '
+                unstash 'app'
+                bat 'make check' 
             }
-        }
-        stage('Deliver') { 
-            steps {
-                sh './jenkins/scripts/deliver.sh' 
+            post {
+                always {
+                    junit '**/target/*.xml'
+                }
             }
         }
     }
