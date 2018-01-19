@@ -10,7 +10,6 @@ pipeline {
         AWS_SECRET = credentials('AWS_SECRET')
         DHUB_ACCESS = credentials('DHUB_UPW')   //username:passwd type 
     }
-    }
     stages {
         stage('Build') {
             agent {
