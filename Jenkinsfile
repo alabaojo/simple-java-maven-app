@@ -11,7 +11,7 @@ pipeline {
         VERSION = readMavenPom().getVersion()
     }
     stages {
-        stage('Build') {
+        stage('BuildB') {
             steps {
                 sh 'mvn -B -DskipTests clean package'
             }
@@ -31,11 +31,11 @@ pipeline {
                 branch 'master'    //only run these steps on the master branch
             }
             steps {
-                sh """
+                sh '
                     docker build -t ${IMAGE} .
                     docker tag ${IMAGE} ${IMAGE}:${VERSION}
                     docker push ${IMAGE}:${VERSION}
-                """
+                '
             }
         }
         stage('Deliver') { 
