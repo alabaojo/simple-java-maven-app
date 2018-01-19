@@ -24,19 +24,5 @@ pipeline {
                 }
             }
         }
-        stage('Test on Windows') {
-            agent {
-                label 'windows'
-            }
-            steps {
-                unstash 'app'
-                bat 'make check' 
-            }
-            post {
-                always {
-                    junit '**/target/*.xml'
-                }
-            }
-        }
-    }
+s    }
 }
