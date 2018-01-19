@@ -5,6 +5,11 @@ pipeline {
             args '-v /root/.m2:/root/.m2'
         }
     }
+
+    environment {
+        IMAGE = readMavenPom().getArtifactId()    //Use Pipeline Utility Steps
+        VERSION = readMavenPom().getVersion()
+    }
     stages {
         stage('Build') {
             steps {
@@ -25,7 +30,7 @@ pipeline {
             when {
                 branch 'master'    //only run these steps on the master branch
             }ss
-            steps {
+            steps {s
                 sh """
                     docker build -t ${IMAGE} .
                     docker tag ${IMAGE} ${IMAGE}:${VERSION}
